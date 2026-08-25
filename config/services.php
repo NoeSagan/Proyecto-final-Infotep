@@ -35,4 +35,21 @@ return [
         ],
     ],
 
+    'autodev' => [
+        'key' => env('AUTO_DEV_API_KEY'),
+    ],
+
+    'car_specs' => [
+        'key' => env('CAR_SPECS_API_KEY'),
+    ],
+
+    'autoscout24' => [
+        'key' => env('AUTOSCOUT24_API_KEY'),
+    ],
+
+    'car_images' => [
+        'key'    => env('CAR_IMAGES_API_KEY'),
+        'secret' => env('CAR_IMAGES_API_SECRET'),
+    ],
+
 ];
