@@ -22,6 +22,8 @@ class Vehicle extends Model
         'passenger_capacity',
         'luggage_capacity',
         'key_features',
+        'maintenance_notes',
+        'available_from',
         'current_mileage',
         'current_fuel_level',
     ];
