@@ -102,19 +102,38 @@
                         </div>
                     @endif
 
-                    {{-- Acción --}}
-                    <div class="border-t pt-6 flex justify-end">
+                    {{-- Acciones --}}
+                    @php
+                        $esFavorito = auth()->user()->favoriteVehicles()->where('vehicle_id', $vehicle->id)->exists();
+                    @endphp
+
+                    <div class="border-t pt-6 flex items-center justify-between gap-3">
+                        {{-- Botón favorito --}}
+                        @if ($esFavorito)
+                            <form action="{{ route('favoritos.destroy', $vehicle) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="flex items-center gap-1 text-sm border border-red-300 text-red-600 hover:bg-red-50 font-medium py-2 px-4 rounded-lg transition">
+                                    ♥ Quitar de favoritos
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('favoritos.store', $vehicle) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                        class="flex items-center gap-1 text-sm border border-gray-300 text-gray-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition">
+                                    ♡ Añadir a favoritos
+                                </button>
+                            </form>
+                        @endif
+
+                        {{-- Botón reservar --}}
                         @if ($vehicle->status === 'disponible')
-                            @if (Route::has('vehiculos.reservar'))
-                                <a href="{{ route('vehiculos.reservar', $vehicle) }}"
-                                   class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition">
-                                    Reservar este vehículo
-                                </a>
-                            @else
-                                <span class="bg-blue-200 text-blue-500 font-semibold py-3 px-8 rounded-lg cursor-not-allowed">
-                                    Reservar este vehículo
-                                </span>
-                            @endif
+                            <a href="{{ route('vehiculos.reservar', $vehicle) }}"
+                               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-8 rounded-lg transition">
+                                Reservar este vehículo
+                            </a>
                         @else
                             <p class="text-gray-500 italic text-sm">Este vehículo no está disponible para reservas en este momento.</p>
                         @endif
