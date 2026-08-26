@@ -50,6 +50,14 @@
                                        class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-3 rounded-lg transition">
                                         Pagar
                                     </a>
+                                    <form action="{{ route('mis-reservas.cancel', $reservation) }}" method="POST"
+                                          onsubmit="return confirm('¿Cancelar esta reserva?')">
+                                        @csrf
+                                        <button type="submit"
+                                                class="text-sm border border-red-300 text-red-600 hover:bg-red-50 font-medium py-1.5 px-3 rounded-lg transition">
+                                            Cancelar
+                                        </button>
+                                    </form>
                                 @endif
                                 <a href="{{ route('mis-reservas.show', $reservation) }}"
                                    class="text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-1.5 px-3 rounded-lg transition">

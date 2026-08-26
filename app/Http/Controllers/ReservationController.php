@@ -94,4 +94,16 @@ class ReservationController extends Controller
         $reservation->load('vehicle.category', 'extras');
         return view('reservas.show', compact('reservation'));
     }
+
+    public function cancel(Reservation $reservation)
+    {
+        abort_if($reservation->user_id !== auth()->id(), 403);
+        abort_if($reservation->status !== 'pendiente', 403);
+
+        $reservation->update(['status' => 'cancelada']);
+        $reservation->vehicle->update(['status' => 'disponible']);
+
+        return redirect()->route('mis-reservas.index')
+            ->with('success', 'Reserva cancelada correctamente.');
+    }
 }

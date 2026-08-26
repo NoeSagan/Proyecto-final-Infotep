@@ -35,6 +35,10 @@ class ReservationController extends Controller
 
         $reservation->update(['status' => $request->status]);
 
+        if (in_array($request->status, ['completada', 'cancelada'])) {
+            $reservation->vehicle->update(['status' => 'disponible']);
+        }
+
         return redirect()->route('admin.reservas.show', $reservation)
             ->with('success', 'Estado de la reserva actualizado a «' . ucfirst($request->status) . '».');
     }

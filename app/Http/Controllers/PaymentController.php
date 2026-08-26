@@ -29,6 +29,8 @@ class PaymentController extends Controller
             'delivery_fuel_level'  => $vehicle->current_fuel_level,
         ]);
 
+        $vehicle->update(['status' => 'alquilado']);
+
         return redirect()->route('mis-reservas.show', $reservation)
             ->with('success', '¡Reserva confirmada! Los datos de entrega han sido registrados.');
     }
