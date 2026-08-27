@@ -1,3 +1,95 @@
+@import '../../vendor/ddfsn/blade-components/resources/css/blade-components.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --sidebar: #ffffff;
+}
+
+/* ── Alertas: más padding y contraste ── */
+[data-slot="alert"] {
+    padding: 12px 16px;
+}
+
+/* ── Botones outline: borde azul fijo, sin hover azul ── */
+[data-slot="button"][data-style="outline"] {
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+[data-slot="button"][data-style="outline"]:hover,
+[data-slot="button"][data-style="outline"]:focus {
+    background-color: transparent;
+}
+
+/* ── Botones ghost: hover gris, no azul ── */
+[data-slot="button"][data-style="ghost"]:hover,
+[data-slot="button"][data-style="ghost"]:focus {
+    background-color: var(--muted);
+}
+
+/* ── Fix: ddfsn mobile sidebar (Tailwind v3 compatibility) ── */
+/* These rules replace Tailwind v4-only class syntax used by the vendor package */
+
+/* Initially hide sidebar on mobile until JS boots */
+@media (max-width: 1023px) {
+    ddfsn-sidebar[data-ddfsn-sidebar-cloak] {
+        display: none;
+    }
+}
+
+/* On mobile breakpoint: make sidebar a fixed overlay */
+ddfsn-sidebar[data-ddfsn-sidebar-breakpoint-down] {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow-y: auto;
+}
+
+/* Slide off-screen when collapsed on mobile */
+ddfsn-sidebar[data-ddfsn-sidebar-breakpoint-down][data-ddfsn-sidebar-collapsed] {
+    transform: translateX(-100%);
+}
+
+/* Smooth slide transition (only after cloak is removed) */
+ddfsn-sidebar:not([data-ddfsn-sidebar-cloak]) {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+/* Show backdrop when sidebar is expanded on mobile */
+ddfsn-sidebar-toggle[data-slot="sidebar-backdrop"][data-ddfsn-sidebar-breakpoint-down]:not([data-ddfsn-sidebar-collapsed]) {
+    display: block;
+}
+
+@layer base {
+    /* Checkbox, toggle y badge: radio 2rem */
+    [data-slot="checkbox"],
+    [data-slot="toggle"],
+    [data-slot="badge"] {
+        border-radius: 2rem;
+    }
+
+    /* Profundidad 3D en fields */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        box-shadow:
+            inset 0 2px 4px rgba(13, 21, 41, 0.07),
+            inset 0 1px 2px rgba(13, 21, 41, 0.04);
+    }
+
+    /* Noise en fields — SVG fractal noise como capa de fondo */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+            linear-gradient(to bottom, #ffffff, #ffffff);
+        background-blend-mode: multiply;
+    }
+}
