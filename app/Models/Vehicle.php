@@ -14,6 +14,7 @@ class Vehicle extends Model
         'brand',
         'model',
         'model_alternative',
+        'year',
         'plate',
         'price_per_day',
         'status',
@@ -22,10 +23,12 @@ class Vehicle extends Model
         'passenger_capacity',
         'luggage_capacity',
         'key_features',
+        'image_url',
         'maintenance_notes',
         'available_from',
         'current_mileage',
         'current_fuel_level',
+        'external_id',
     ];
 
     public function category(): BelongsTo

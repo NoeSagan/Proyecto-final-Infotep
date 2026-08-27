@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Extra extends Model
 {
-    protected $fillable = ['name', 'price'];
+    protected $fillable = ['name', 'price', 'selection_type'];
 
     public function reservations(): BelongsToMany
     {

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Themes\AutoAlquilerTheme;
+use DistortedFusion\BladeComponents\ThemeManager;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,5 +20,8 @@ class AppServiceProvider extends ServiceProvider
             'create' => 'crear',
             'edit'   => 'editar',
         ]);
+
+        ThemeManager::disableDefaultTheme();
+        ThemeManager::registerTheme(AutoAlquilerTheme::class);
     }
 }
