@@ -1,97 +1,144 @@
-# Sistema de Alquiler de Vehículos
+# AutoAlquiler
 
-Aplicación web full-stack desarrollada en **Laravel (PHP)** para la gestión completa de un servicio de alquiler de vehículos: inventario, disponibilidad por fechas, reservas, extras y facturación.
+Aplicación web full-stack para la gestión completa de un servicio de alquiler de vehículos. Desarrollada como proyecto final del curso de Desarrollo Web con PHP en **INFOTEP**.
+
+---
 
 ## Descripción
 
-El sistema resuelve el problema de las reservas superpuestas y facilita todo el proceso de rentar un vehículo, desde la búsqueda por fechas y capacidad hasta la confirmación del pago y la entrega del vehículo, incluyendo servicios adicionales y una lista de favoritos por usuario.
+AutoAlquiler digitaliza el proceso completo de una empresa de alquiler de vehículos: el cliente busca por fechas, capacidad y categoría, reserva el vehículo, selecciona extras y confirma el pago. El administrador gestiona el inventario, atiende las reservas y consulta reportes en tiempo real. El sistema previene choques de reserva, aplica cargos por cancelación tardía y mantiene un historial completo de entregas.
 
-## Tecnologías
+---
 
-- **Backend:** Laravel (PHP), gestionado con Composer
-- **Base de datos:** PostgreSQL, estructurada mediante migraciones
-- **ORM:** Eloquent (relaciones `hasMany`, `belongsTo`, `belongsToMany`)
-- **Vistas:** Blade con layouts y componentes reutilizables
-- **Estilos:** Tailwind CSS o Bootstrap
-- **Autenticación:** Laravel Breeze
+## Stack tecnológico
 
-## Funcionalidades principales
-
-- Registro, login y recuperación de contraseña.
-- Catálogo de vehículos con búsqueda opcional por fechas y cantidad de pasajeros.
-- Ficha detallada de cada vehículo (categoría, transmisión, combustible, capacidad, prestaciones).
-- Lista de favoritos por usuario.
-- Reserva con selección de servicios extras (GPS, silla infantil, asistencia en carretera, seguros, portaequipajes, etc.).
-- Cálculo automático del costo total (días de alquiler + extras).
-- Validación de disponibilidad para evitar choques de reservas.
-- Confirmación de pago con entrega de placa, kilometraje inicial y nivel de combustible/carga.
-- Panel de administración protegido por middleware: gestión de vehículos, categorías, extras, reservas y usuarios.
-- Dashboard con métricas reales (reservas activas, vehículos disponibles, ganancias).
-
-## Roles del sistema
-
-| Rol | Permisos |
+| Capa | Tecnología |
 |---|---|
-| Cliente | Busca vehículos, reserva, gestiona sus favoritos y consulta sus reservas |
-| Administrador | Gestiona inventario, categorías, extras, reservas y usuarios |
+| Backend | PHP 8.1+ · Laravel 11 |
+| Autenticación | Laravel Breeze |
+| Base de datos | PostgreSQL (Supabase) |
+| ORM | Eloquent |
+| Vistas | Blade · ddfsn/blade-components 1.6.1 |
+| Estilos | Tailwind CSS 3.4 |
+| JavaScript | Alpine.js 3 |
+| Bundler | Vite 8 |
+
+---
+
+## Funcionalidades
+
+### Cliente
+- Registro, login y recuperación de contraseña.
+- Catálogo de vehículos con filtros por fecha, pasajeros, categoría, combustible, transmisión y presupuesto.
+- Ficha técnica detallada por vehículo (categoría, transmisión, combustible, capacidades, kilometraje, extras).
+- Lista de favoritos personal (toggle instantáneo).
+- Flujo de reserva en tres pasos: fechas + extras → resumen de pago → comprobante.
+- Cálculo del costo total en tiempo real (días × tarifa + extras × días).
+- Validación de disponibilidad: no se puede reservar un vehículo ya ocupado en las fechas solicitadas.
+- Cancelación de reservas con política de cargos según antelación.
+- Comprobante imprimible de la reserva confirmada.
+
+### Administrador
+- Dashboard con métricas en tiempo real: reservas activas, vehículos disponibles, ingresos del mes, total de clientes.
+- CRUD completo de vehículos, categorías y extras.
+- Lookup de VIN para autocompletar la ficha técnica desde la API de Auto.dev.
+- Registro de mantenimiento por vehículo.
+- Gestión de reservas: visualización, cambio de estado y exportación CSV.
+- Gestión de usuarios: listado, detalle y cambio de rol.
+- Reportes: vehículos más alquilados, ingresos por mes, ocupación por categoría.
+
+### Catálogo (tres fuentes en cascada)
+1. **AutoScout24** — listings reales con imágenes (API de pago, prioridad máxima).
+2. **CarSpecs** — 1 000+ modelos pre-cacheados (caché 24 h, fuente principal).
+3. **Base de datos local** — vehículos sembrados e importados manualmente.
+
+---
+
+## Roles
+
+| Rol | Acceso |
+|---|---|
+| `cliente` | Catálogo, reservas, favoritos, perfil |
+| `admin` | Todo lo anterior + panel de administración completo |
+
+La redirección tras el login es directa: el admin va siempre al dashboard, el cliente al catálogo.
+
+---
+
+## Política de cancelación
+
+| Antelación a la fecha de inicio | Cargo |
+|---|---|
+| > 48 horas (o reserva pendiente) | Gratuita |
+| 24 – 48 horas | 25 % del total |
+| < 24 horas | 50 % del total |
+
+---
 
 ## Requisitos previos
 
-- PHP >= 8.1
+- PHP 8.1+ con extensión `pgsql` habilitada
 - Composer
-- PostgreSQL
-- Node.js y npm (para compilar los assets del frontend)
+- Node.js y npm
+- Acceso a una base de datos PostgreSQL
+
+> **Nota para Windows con Herd Lite:** el PHP de Herd Lite no incluye la extensión `pgsql`. Usar el intérprete en `C:\php\php.exe` que sí la tiene compilada.
+
+---
 
 ## Instalación
 
 ```bash
-# Clonar el repositorio
+# 1. Clonar el repositorio
 git clone <url-del-repositorio>
-cd sistema-alquiler-vehiculos
+cd autoalquiler
 
-# Instalar dependencias de PHP
+# 2. Dependencias PHP
 composer install
 
-# Copiar el archivo de entorno y generar la clave de la aplicación
+# 3. Entorno
 cp .env.example .env
 php artisan key:generate
+# Configurar DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD en .env
 
-# Configurar la conexión a la base de datos en el archivo .env
-# DB_DATABASE, DB_USERNAME, DB_PASSWORD, etc.
+# 4. Base de datos
+php artisan migrate --seed
 
-# Ejecutar las migraciones
-php artisan migrate
-
-# Instalar dependencias de frontend y compilar assets
+# 5. Frontend
 npm install
-npm run dev
+npm run build
 
-# Levantar el servidor de desarrollo
+# 6. Servidor de desarrollo
 php artisan serve
 ```
 
-La aplicación quedará disponible en `http://localhost:8000`.
+La aplicación queda disponible en `http://localhost:8000`.
 
-## Estructura de la base de datos
+**Credenciales de prueba:**
 
-El sistema se compone de las siguientes entidades principales: `User`, `Category`, `Vehicle`, `Reservation`, `Extra`, `Favorite` y las tablas pivote `reservation_extra` y `favorites`. El detalle completo de campos y relaciones está documentado en [`documentacion.md`](./documentacion.md).
+| Rol | Email | Contraseña |
+|---|---|---|
+| Admin | admin@alquiler.com | password |
+| Cliente | maria@alquiler.com | password |
 
-## Documentación del proyecto
+---
+
+## Comandos Artisan personalizados
+
+```bash
+# Pre-cargar el catálogo de CarSpecs en caché (recomendado antes del primer uso)
+php artisan catalog:build
+
+# Importar vehículos desde la API a la base de datos
+php artisan vehicles:import        # importa 70 por defecto
+php artisan vehicles:import 50     # importa N vehículos
+```
+
+---
+
+## Documentación
 
 | Archivo | Contenido |
 |---|---|
-| [`documentacion.md`](./documentacion.md) | Documentación técnica completa: requerimientos funcionales, modelo de datos, relaciones y listado de vistas/formularios/rutas |
-| [`pasos.md`](./pasos.md) | Guía paso a paso para construir el proyecto en el orden recomendado |
-
-## Orden de desarrollo recomendado
-
-1. Configuración inicial del proyecto y autenticación.
-2. Migraciones de la base de datos.
-3. Modelos Eloquent y relaciones.
-4. Roles y middleware.
-5. CRUD del administrador (categorías, vehículos, extras).
-6. Búsqueda, disponibilidad y capacidad.
-7. Flujo de reserva completa (extras, pago, entrega, favoritos).
-8. Dashboard, panel avanzado de administración y pulido final.
-
-El detalle completo de cada paso está en [`pasos.md`](./pasos.md).
+| [`Documentacion/sistema.md`](./Documentacion/sistema.md) | Arquitectura, base de datos, módulos, rutas, seguridad y decisiones técnicas |
+| [`Documentacion/diseno-ui.md`](./Documentacion/diseno-ui.md) | Sistema de diseño: componentes, paleta de color, radios, efectos y justificación de uso |
