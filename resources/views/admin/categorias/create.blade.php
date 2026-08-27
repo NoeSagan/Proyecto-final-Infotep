@@ -1,56 +1,50 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('admin.categorias.index') }}" class="text-gray-500 hover:text-gray-700">&larr; Volver</a>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Nueva Categoría</h2>
+    <x-slot:title>Nueva Categoría | AutoAlquiler</x-slot:title>
+
+    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <a href="{{ route('admin.categorias.index') }}"
+           class="inline-flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors mb-6">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Volver a categorías
+        </a>
+
+        <h1 class="text-xl font-semibold text-[var(--foreground)] mb-6">Nueva Categoría</h1>
+
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] p-6">
+            <form action="{{ route('admin.categorias.store') }}" method="POST" class="space-y-4">
+                @csrf
+
+                <div>
+                    <label for="name" class="block text-sm font-semibold mb-1">Nombre</label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}"
+                           class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('name') border-[var(--danger)] @enderror"
+                           required placeholder="Ej: SUV, Sedán, Compacto">
+                    @error('name')
+                        <p class="text-[var(--danger)] text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-semibold mb-1">
+                        Descripción <span class="font-normal text-[var(--muted-foreground)]">(opcional)</span>
+                    </label>
+                    <textarea id="description" name="description" rows="3"
+                              class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 py-2 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('description') border-[var(--danger)] @enderror"
+                              placeholder="Describe brevemente esta categoría de vehículos...">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="text-[var(--danger)] text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <x-btn href="{{ route('admin.categorias.index') }}" style="outline" size="sm">Cancelar</x-btn>
+                    <x-btn type="submit" size="sm">Guardar categoría</x-btn>
+                </div>
+            </form>
         </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm rounded-lg p-6">
-
-                <form action="{{ route('admin.categorias.store') }}" method="POST">
-                    @csrf
-
-                    <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                            Nombre <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="name" name="name"
-                               value="{{ old('name') }}"
-                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                      @error('name') border-red-500 @enderror">
-                        @error('name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="mb-6">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                            Descripción
-                        </label>
-                        <textarea id="description" name="description" rows="3"
-                                  class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                         @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
-                        @error('description')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex justify-end gap-3">
-                        <a href="{{ route('admin.categorias.index') }}"
-                           class="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                            Cancelar
-                        </a>
-                        <button type="submit"
-                                class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">
-                            Guardar
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
     </div>
 </x-app-layout>

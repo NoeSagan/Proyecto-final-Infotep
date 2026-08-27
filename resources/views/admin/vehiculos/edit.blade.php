@@ -1,213 +1,211 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('admin.vehiculos.index') }}" class="text-gray-500 hover:text-gray-700">&larr; Volver</a>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Editar Vehículo — {{ $vehicle->plate }}
-            </h2>
-        </div>
-    </x-slot>
+    <x-slot:title>Editar Vehículo {{ $vehicle->plate }} | AutoAlquiler</x-slot:title>
 
-    <div class="py-8">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm rounded-lg p-6">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-                <form action="{{ route('admin.vehiculos.update', $vehicle) }}" method="POST">
-                    @csrf
-                    @method('PUT')
+        <a href="{{ route('admin.vehiculos.index') }}"
+           class="inline-flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors mb-6">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Volver a vehículos
+        </a>
 
-                    {{-- Sección: Identificación --}}
-                    <h3 class="text-base font-semibold text-gray-700 mb-3 border-b pb-1">Identificación</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <h1 class="text-xl font-semibold text-[var(--foreground)] mb-6">Editar Vehículo: {{ $vehicle->plate }}</h1>
+
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] p-6">
+
+            {{-- Imagen actual --}}
+            @if ($vehicle->image_url)
+                <div class="mb-6">
+                    <p class="block text-sm font-semibold mb-1">Imagen actual</p>
+                    <div class="h-40 bg-[var(--muted)] rounded-[var(--radius)] overflow-hidden">
+                        <img src="{{ $vehicle->image_url }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}"
+                             class="w-full h-full object-contain"
+                             onerror="this.parentElement.style.display='none'">
+                    </div>
+                    <p class="text-xs text-[var(--muted-foreground)] mt-1">Se actualiza automáticamente si cambia la marca o el modelo.</p>
+                </div>
+            @endif
+
+            @if (!empty($makes))
+                <datalist id="makes-list">
+                    @foreach ($makes as $make)
+                        <option value="{{ $make }}">
+                    @endforeach
+                </datalist>
+            @endif
+
+            <form action="{{ route('admin.vehiculos.update', $vehicle) }}" method="POST" class="space-y-6">
+                @csrf
+                @method('PUT')
+
+                {{-- Identificación --}}
+                <div>
+                    <p class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-4">Identificación</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                         <div>
-                            <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">
-                                Categoría <span class="text-red-500">*</span>
-                            </label>
-                            <select id="category_id" name="category_id"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                           @error('category_id') border-red-500 @enderror">
+                            <label for="category_id" class="block text-sm font-semibold mb-1">Categoría</label>
+                            <select id="category_id" name="category_id" required
+                                    class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('category_id') border-[var(--danger)] @enderror">
                                 @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}"
-                                        {{ old('category_id', $vehicle->category_id) == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
+                                    <option value="{{ $cat->id }}" {{ old('category_id', $vehicle->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                 @endforeach
                             </select>
-                            @error('category_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            @error('category_id') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="plate" class="block text-sm font-medium text-gray-700 mb-1">
-                                Placa <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="plate" name="plate"
-                                   value="{{ old('plate', $vehicle->plate) }}"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('plate') border-red-500 @enderror">
-                            @error('plate') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            <label for="plate" class="block text-sm font-semibold mb-1">Placa</label>
+                            <input type="text" id="plate" name="plate" value="{{ old('plate', $vehicle->plate) }}"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('plate') border-[var(--danger)] @enderror"
+                                   required placeholder="Ej: A123456">
+                            @error('plate') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">
-                                Marca <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="brand" name="brand"
-                                   value="{{ old('brand', $vehicle->brand) }}"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('brand') border-red-500 @enderror">
-                            @error('brand') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            <label for="brand" class="block text-sm font-semibold mb-1">Marca</label>
+                            <input type="text" id="brand" name="brand" value="{{ old('brand', $vehicle->brand) }}"
+                                   list="{{ !empty($makes) ? 'makes-list' : '' }}"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('brand') border-[var(--danger)] @enderror"
+                                   required placeholder="Ej: Toyota, Honda, BMW">
+                            @error('brand') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="model" class="block text-sm font-medium text-gray-700 mb-1">
-                                Modelo <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="model" name="model"
-                                   value="{{ old('model', $vehicle->model) }}"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('model') border-red-500 @enderror">
-                            @error('model') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            <label for="model" class="block text-sm font-semibold mb-1">Modelo</label>
+                            <input type="text" id="model" name="model" value="{{ old('model', $vehicle->model) }}"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('model') border-[var(--danger)] @enderror"
+                                   required placeholder="Ej: Corolla, Civic, X5">
+                            @error('model') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="model_alternative" class="block text-sm font-medium text-gray-700 mb-1">
-                                Modelo alternativo
+                            <label for="model_alternative" class="block text-sm font-semibold mb-1">
+                                Versión / Trim <span class="font-normal text-[var(--muted-foreground)]">(opcional)</span>
                             </label>
                             <input type="text" id="model_alternative" name="model_alternative"
                                    value="{{ old('model_alternative', $vehicle->model_alternative) }}"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                                   placeholder="Ej: LX, Sport, Premium">
                         </div>
 
                         <div>
-                            <label for="price_per_day" class="block text-sm font-medium text-gray-700 mb-1">
-                                Precio por día (USD) <span class="text-red-500">*</span>
-                            </label>
+                            <label for="year" class="block text-sm font-semibold mb-1">Año</label>
+                            <input type="number" id="year" name="year" value="{{ old('year', $vehicle->year) }}"
+                                   min="1990" max="{{ date('Y') + 1 }}" placeholder="{{ date('Y') }}"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]">
+                        </div>
+
+                        <div>
+                            <label for="price_per_day" class="block text-sm font-semibold mb-1">Precio por día (USD)</label>
                             <input type="number" id="price_per_day" name="price_per_day"
-                                   value="{{ old('price_per_day', $vehicle->price_per_day) }}"
-                                   min="0" step="0.01"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('price_per_day') border-red-500 @enderror">
-                            @error('price_per_day') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                   value="{{ old('price_per_day', $vehicle->price_per_day) }}" min="0" step="0.01"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('price_per_day') border-[var(--danger)] @enderror"
+                                   required placeholder="0.00">
+                            @error('price_per_day') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
+                </div>
 
-                    {{-- Sección: Ficha técnica --}}
-                    <h3 class="text-base font-semibold text-gray-700 mb-3 border-b pb-1">Ficha técnica</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                {{-- Ficha técnica --}}
+                <div class="border-t border-[var(--border)] pt-5">
+                    <p class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-4">Ficha técnica</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                         <div>
-                            <label for="transmission_type" class="block text-sm font-medium text-gray-700 mb-1">
-                                Transmisión <span class="text-red-500">*</span>
-                            </label>
-                            <select id="transmission_type" name="transmission_type"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                           @error('transmission_type') border-red-500 @enderror">
+                            <label for="transmission_type" class="block text-sm font-semibold mb-1">Transmisión</label>
+                            <select id="transmission_type" name="transmission_type" required
+                                    class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('transmission_type') border-[var(--danger)] @enderror">
                                 <option value="automatica" {{ old('transmission_type', $vehicle->transmission_type) === 'automatica' ? 'selected' : '' }}>Automática</option>
                                 <option value="manual"     {{ old('transmission_type', $vehicle->transmission_type) === 'manual'     ? 'selected' : '' }}>Manual</option>
                             </select>
-                            @error('transmission_type') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            @error('transmission_type') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="fuel_type" class="block text-sm font-medium text-gray-700 mb-1">
-                                Combustible <span class="text-red-500">*</span>
-                            </label>
-                            <select id="fuel_type" name="fuel_type"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                           @error('fuel_type') border-red-500 @enderror">
+                            <label for="fuel_type" class="block text-sm font-semibold mb-1">Combustible</label>
+                            <select id="fuel_type" name="fuel_type" required
+                                    class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('fuel_type') border-[var(--danger)] @enderror">
                                 <option value="gasolina" {{ old('fuel_type', $vehicle->fuel_type) === 'gasolina' ? 'selected' : '' }}>Gasolina</option>
                                 <option value="diesel"   {{ old('fuel_type', $vehicle->fuel_type) === 'diesel'   ? 'selected' : '' }}>Diésel</option>
                                 <option value="hibrido"  {{ old('fuel_type', $vehicle->fuel_type) === 'hibrido'  ? 'selected' : '' }}>Híbrido</option>
                                 <option value="electrico"{{ old('fuel_type', $vehicle->fuel_type) === 'electrico'? 'selected' : '' }}>Eléctrico</option>
                             </select>
-                            @error('fuel_type') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            @error('fuel_type') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="passenger_capacity" class="block text-sm font-medium text-gray-700 mb-1">
-                                Capacidad de pasajeros <span class="text-red-500">*</span>
-                            </label>
+                            <label for="passenger_capacity" class="block text-sm font-semibold mb-1">Capacidad de pasajeros</label>
                             <input type="number" id="passenger_capacity" name="passenger_capacity"
-                                   value="{{ old('passenger_capacity', $vehicle->passenger_capacity) }}" min="1"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('passenger_capacity') border-red-500 @enderror">
-                            @error('passenger_capacity') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                   value="{{ old('passenger_capacity', $vehicle->passenger_capacity) }}" min="1" max="20"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('passenger_capacity') border-[var(--danger)] @enderror"
+                                   required placeholder="5">
+                            @error('passenger_capacity') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="luggage_capacity" class="block text-sm font-medium text-gray-700 mb-1">
-                                Capacidad de maletas
+                            <label for="luggage_capacity" class="block text-sm font-semibold mb-1">
+                                Capacidad de maletas <span class="font-normal text-[var(--muted-foreground)]">(opcional)</span>
                             </label>
                             <input type="number" id="luggage_capacity" name="luggage_capacity"
                                    value="{{ old('luggage_capacity', $vehicle->luggage_capacity) }}" min="0"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                                   placeholder="2">
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="key_features" class="block text-sm font-medium text-gray-700 mb-1">
-                                Prestaciones clave
+                            <label for="key_features" class="block text-sm font-semibold mb-1">
+                                Prestaciones clave <span class="font-normal text-[var(--muted-foreground)]">(opcional)</span>
                             </label>
                             <textarea id="key_features" name="key_features" rows="2"
-                                      class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('key_features', $vehicle->key_features) }}</textarea>
+                                      class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 py-2 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]">{{ old('key_features', $vehicle->key_features) }}</textarea>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Sección: Estado actual --}}
-                    <h3 class="text-base font-semibold text-gray-700 mb-3 border-b pb-1">Estado actual</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                {{-- Estado actual --}}
+                <div class="border-t border-[var(--border)] pt-5">
+                    <p class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-4">Estado actual</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
                         <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">
-                                Estado <span class="text-red-500">*</span>
-                            </label>
-                            <select id="status" name="status"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                           @error('status') border-red-500 @enderror">
+                            <label for="status" class="block text-sm font-semibold mb-1">Estado</label>
+                            <select id="status" name="status" required
+                                    class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('status') border-[var(--danger)] @enderror">
                                 <option value="disponible"    {{ old('status', $vehicle->status) === 'disponible'    ? 'selected' : '' }}>Disponible</option>
                                 <option value="alquilado"     {{ old('status', $vehicle->status) === 'alquilado'     ? 'selected' : '' }}>Alquilado</option>
                                 <option value="mantenimiento" {{ old('status', $vehicle->status) === 'mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
                             </select>
-                            @error('status') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            @error('status') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="current_mileage" class="block text-sm font-medium text-gray-700 mb-1">
-                                Kilometraje actual <span class="text-red-500">*</span>
-                            </label>
+                            <label for="current_mileage" class="block text-sm font-semibold mb-1">Kilometraje actual</label>
                             <input type="number" id="current_mileage" name="current_mileage"
                                    value="{{ old('current_mileage', $vehicle->current_mileage) }}" min="0"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('current_mileage') border-red-500 @enderror">
-                            @error('current_mileage') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('current_mileage') border-[var(--danger)] @enderror"
+                                   required placeholder="0">
+                            @error('current_mileage') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="current_fuel_level" class="block text-sm font-medium text-gray-700 mb-1">
-                                Nivel de combustible (%) <span class="text-red-500">*</span>
-                            </label>
+                            <label for="current_fuel_level" class="block text-sm font-semibold mb-1">Combustible (%)</label>
                             <input type="number" id="current_fuel_level" name="current_fuel_level"
-                                   value="{{ old('current_fuel_level', $vehicle->current_fuel_level) }}"
-                                   min="0" max="100"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500
-                                          @error('current_fuel_level') border-red-500 @enderror">
-                            @error('current_fuel_level') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                   value="{{ old('current_fuel_level', $vehicle->current_fuel_level) }}" min="0" max="100"
+                                   class="w-full border border-[var(--border)] rounded-[var(--radius)] bg-[var(--input)] px-3 h-9 text-sm placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] @error('current_fuel_level') border-[var(--danger)] @enderror"
+                                   required placeholder="100">
+                            @error('current_fuel_level') <p class="text-[var(--danger)] text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex justify-end gap-3">
-                        <a href="{{ route('admin.vehiculos.index') }}"
-                           class="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                            Cancelar
-                        </a>
-                        <button type="submit"
-                                class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">
-                            Actualizar Vehículo
-                        </button>
-                    </div>
-                </form>
-
-            </div>
+                <div class="flex justify-end gap-2 border-t border-[var(--border)] pt-5">
+                    <x-btn href="{{ route('admin.vehiculos.index') }}" style="outline" size="sm">Cancelar</x-btn>
+                    <x-btn type="submit" size="sm">Actualizar vehículo</x-btn>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>

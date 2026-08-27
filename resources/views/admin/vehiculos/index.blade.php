@@ -1,99 +1,87 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Gestión de Vehículos
-            </h2>
-            <a href="{{ route('admin.vehiculos.create') }}"
-               class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
-                + Nuevo Vehículo
-            </a>
+    <x-slot:title>Vehículos | AutoAlquiler</x-slot:title>
+
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+            <h1 class="text-xl font-semibold text-[var(--foreground)]">Gestión de Vehículos</h1>
+            <x-btn href="{{ route('admin.vehiculos.create') }}" size="sm">+ Nuevo Vehículo</x-btn>
         </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        @if (session('success'))
+            <x-alert style="success" class="mb-4">{{ session('success') }}</x-alert>
+        @endif
+        @if (session('error'))
+            <x-alert style="danger" class="mb-4">{{ session('error') }}</x-alert>
+        @endif
 
-            @if (session('success'))
-                <div class="mb-4 bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="mb-4 bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Placa</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehículo</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio/día</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($vehicles as $vehicle)
-                            <tr>
-                                <td class="px-4 py-4 font-mono text-sm text-gray-900">{{ $vehicle->plate }}</td>
-                                <td class="px-4 py-4">
-                                    <div class="font-medium text-gray-900">{{ $vehicle->brand }} {{ $vehicle->model }}</div>
-                                    @if ($vehicle->model_alternative)
-                                        <div class="text-xs text-gray-500">{{ $vehicle->model_alternative }}</div>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-4 text-gray-600">{{ $vehicle->category->name }}</td>
-                                <td class="px-4 py-4 text-gray-600">$ {{ number_format($vehicle->price_per_day, 2) }}</td>
-                                <td class="px-4 py-4">
-                                    @php
-                                        $statusColors = [
-                                            'disponible'   => 'bg-green-100 text-green-800',
-                                            'alquilado'    => 'bg-blue-100 text-blue-800',
-                                            'mantenimiento'=> 'bg-yellow-100 text-yellow-800',
-                                        ];
-                                        $color = $statusColors[$vehicle->status] ?? 'bg-gray-100 text-gray-800';
-                                    @endphp
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $color }}">
-                                        {{ ucfirst($vehicle->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-4 text-right space-x-2">
-                                    <a href="{{ route('admin.vehiculos.edit', $vehicle) }}"
-                                       class="text-indigo-600 hover:text-indigo-900 font-medium">Editar</a>
-
-                                    <form action="{{ route('admin.vehiculos.destroy', $vehicle) }}"
-                                          method="POST" class="inline"
-                                          onsubmit="return confirm('¿Eliminar el vehículo {{ $vehicle->plate }}?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="text-red-600 hover:text-red-900 font-medium">
-                                            Eliminar
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                    No hay vehículos registrados.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-4">
-                {{ $vehicles->links() }}
-            </div>
-
+        <div class="overflow-x-auto">
+        <x-table>
+            <x-table-header>
+                <x-table-row>
+                    <x-table-head>Placa</x-table-head>
+                    <x-table-head>Vehículo</x-table-head>
+                    <x-table-head>Categoría</x-table-head>
+                    <x-table-head>Estado</x-table-head>
+                    <x-table-head align="end">Precio / día</x-table-head>
+                    <x-table-head align="end">Acciones</x-table-head>
+                </x-table-row>
+            </x-table-header>
+            <x-table-body>
+                @forelse ($vehicles as $vehicle)
+                    @php
+                        $statusLabel = match($vehicle->status) {
+                            'disponible'    => 'Disponible',
+                            'alquilado'     => 'Alquilado',
+                            'mantenimiento' => 'Mantenimiento',
+                            default         => ucfirst($vehicle->status),
+                        };
+                    @endphp
+                    <x-table-row>
+                        <x-table-head class="font-mono text-xs text-[var(--muted-foreground)]">
+                            {{ $vehicle->plate }}
+                        </x-table-head>
+                        <x-table-cell>
+                            <p class="font-medium">{{ $vehicle->brand }} {{ $vehicle->model }}</p>
+                            @if ($vehicle->model_alternative)
+                                <p class="text-xs text-[var(--muted-foreground)]">{{ $vehicle->model_alternative }}</p>
+                            @endif
+                        </x-table-cell>
+                        <x-table-cell class="text-[var(--muted-foreground)]">{{ $vehicle->category->name }}</x-table-cell>
+                        <x-table-cell>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-900 text-white">
+                                {{ $statusLabel }}
+                            </span>
+                        </x-table-cell>
+                        <x-table-cell align="end" class="font-semibold">
+                            $ {{ number_format($vehicle->price_per_day, 2) }}
+                        </x-table-cell>
+                        <x-table-cell align="end">
+                            <div class="flex items-center justify-end gap-1">
+                                <x-btn href="{{ route('admin.vehiculos.edit', $vehicle) }}" style="outline" size="sm">Editar</x-btn>
+                                @if ($vehicle->status !== 'mantenimiento')
+                                    <x-btn href="{{ route('admin.vehiculos.mantenimiento', $vehicle) }}" style="ghost" size="sm">Mant.</x-btn>
+                                @endif
+                                <form action="{{ route('admin.vehiculos.destroy', $vehicle) }}" method="POST"
+                                      onsubmit="return confirm('¿Eliminar el vehículo {{ $vehicle->plate }}?')">
+                                    @csrf @method('DELETE')
+                                    <x-btn type="submit" style="danger" size="sm">Eliminar</x-btn>
+                                </form>
+                            </div>
+                        </x-table-cell>
+                    </x-table-row>
+                @empty
+                    <x-table-row>
+                        <x-table-cell colspan="6" align="center" class="py-10 text-[var(--muted-foreground)]">
+                            No hay vehículos registrados.
+                        </x-table-cell>
+                    </x-table-row>
+                @endforelse
+            </x-table-body>
+        </x-table>
         </div>
+
+        <div class="mt-4">{{ $vehicles->links() }}</div>
+
     </div>
 </x-app-layout>
