@@ -1,147 +1,190 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ url()->previous() }}" class="text-gray-500 hover:text-gray-700">&larr; Volver</a>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $vehicle->brand }} {{ $vehicle->model }}
-            </h2>
-        </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-            <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+    {{-- Volver --}}
+    <a href="{{ route('vehiculos.index') }}"
+       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Volver al catálogo
+    </a>
 
-                {{-- Encabezado --}}
-                <div class="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h1 class="text-white text-2xl font-bold">
-                                {{ $vehicle->brand }} {{ $vehicle->model }}
-                            </h1>
-                            @if ($vehicle->model_alternative)
-                                <p class="text-blue-200 text-sm mt-1">{{ $vehicle->model_alternative }}</p>
-                            @endif
-                            <span class="mt-2 inline-block bg-white/20 text-white text-xs font-medium px-3 py-1 rounded-full">
-                                {{ $vehicle->category->name }}
-                            </span>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-blue-200 text-sm">Precio por día</p>
-                            <p class="text-white text-3xl font-bold">$ {{ number_format($vehicle->price_per_day, 2) }}</p>
-                            <p class="text-blue-200 text-xs mt-1">Placa: {{ $vehicle->plate }}</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
 
-                <div class="p-8">
+        {{-- Imagen --}}
+        @if ($vehicle->image_url)
+            <div class="bg-gray-100 h-48 sm:h-64 overflow-hidden">
+                <img src="{{ $vehicle->image_url }}"
+                     alt="{{ $vehicle->brand }} {{ $vehicle->model }}"
+                     class="w-full h-full object-contain"
+                     onerror="this.parentElement.style.display='none'">
+            </div>
+        @endif
 
-                    {{-- Estado --}}
-                    @php
-                        $statusColors = [
-                            'disponible'    => 'bg-green-100 text-green-800',
-                            'alquilado'     => 'bg-blue-100 text-blue-800',
-                            'mantenimiento' => 'bg-yellow-100 text-yellow-800',
-                        ];
-                        $color = $statusColors[$vehicle->status] ?? 'bg-gray-100 text-gray-800';
-                    @endphp
-                    <div class="mb-6 flex items-center gap-3">
-                        <span class="text-sm font-medium text-gray-500">Disponibilidad:</span>
-                        <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $color }}">
-                            {{ ucfirst($vehicle->status) }}
+        <div class="p-6">
+
+            {{-- Encabezado: título + precio + corazón --}}
+            <div class="flex items-start justify-between gap-4 flex-wrap mb-6">
+                <div>
+                    {{-- Pastillas --}}
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                            {{ $vehicle->category->name }}
+                        </span>
+                        @php
+                            $statusLabel = match($vehicle->status) {
+                                'disponible'                     => 'Disponible',
+                                'alquilado'                      => 'Alquilado',
+                                'mantenimiento','en_mantenimiento' => 'Mantenimiento',
+                                default                          => ucfirst($vehicle->status),
+                            };
+                        @endphp
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-900 text-white">
+                            {{ $statusLabel }}
                         </span>
                     </div>
 
-                    {{-- Ficha técnica --}}
-                    <h3 class="text-base font-semibold text-gray-700 mb-4 border-b pb-2">Ficha técnica</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-6">
-
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Transmisión</p>
-                            <p class="mt-1 text-gray-900 font-medium">{{ ucfirst($vehicle->transmission_type) }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Combustible</p>
-                            <p class="mt-1 text-gray-900 font-medium">{{ ucfirst($vehicle->fuel_type) }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Pasajeros</p>
-                            <p class="mt-1 text-gray-900 font-medium">{{ $vehicle->passenger_capacity }}</p>
-                        </div>
-
-                        @if ($vehicle->luggage_capacity !== null)
-                            <div>
-                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Maletas</p>
-                                <p class="mt-1 text-gray-900 font-medium">{{ $vehicle->luggage_capacity }}</p>
-                            </div>
+                    {{-- Nombre + año --}}
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        {{ $vehicle->brand }} {{ $vehicle->model }}
+                        @if ($vehicle->year)
+                            <span class="text-gray-400 font-normal text-base ml-1">{{ $vehicle->year }}</span>
                         @endif
-
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Kilometraje</p>
-                            <p class="mt-1 text-gray-900 font-medium">{{ number_format($vehicle->current_mileage) }} km</p>
-                        </div>
-
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Combustible actual</p>
-                            <p class="mt-1 text-gray-900 font-medium">{{ $vehicle->current_fuel_level }}%</p>
-                        </div>
-                    </div>
-
-                    {{-- Prestaciones --}}
-                    @if ($vehicle->key_features)
-                        <h3 class="text-base font-semibold text-gray-700 mb-3 border-b pb-2">Prestaciones</h3>
-                        <div class="mb-6">
-                            @foreach (explode(',', $vehicle->key_features) as $feature)
-                                <span class="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full mr-2 mb-2">
-                                    {{ trim($feature) }}
-                                </span>
-                            @endforeach
-                        </div>
+                    </h1>
+                    @if ($vehicle->model_alternative)
+                        <p class="text-gray-400 text-sm mt-0.5">{{ $vehicle->model_alternative }}</p>
                     @endif
+                </div>
 
-                    {{-- Acciones --}}
-                    @php
-                        $esFavorito = auth()->user()->favoriteVehicles()->where('vehicle_id', $vehicle->id)->exists();
-                    @endphp
+                {{-- Precio + corazón --}}
+                <div class="flex items-center gap-3 shrink-0">
 
-                    <div class="border-t pt-6 flex items-center justify-between gap-3">
-                        {{-- Botón favorito --}}
-                        @if ($esFavorito)
-                            <form action="{{ route('favoritos.destroy', $vehicle) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="flex items-center gap-1 text-sm border border-red-300 text-red-600 hover:bg-red-50 font-medium py-2 px-4 rounded-lg transition">
-                                    ♥ Quitar de favoritos
-                                </button>
-                            </form>
-                        @else
-                            <form action="{{ route('favoritos.store', $vehicle) }}" method="POST">
-                                @csrf
-                                <button type="submit"
-                                        class="flex items-center gap-1 text-sm border border-gray-300 text-gray-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition">
-                                    ♡ Añadir a favoritos
-                                </button>
-                            </form>
-                        @endif
-
-                        {{-- Botón reservar --}}
-                        @if ($vehicle->status === 'disponible')
-                            <a href="{{ route('vehiculos.reservar', $vehicle) }}"
-                               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-8 rounded-lg transition">
-                                Reservar este vehículo
-                            </a>
-                        @else
-                            <p class="text-gray-500 italic text-sm">Este vehículo no está disponible para reservas en este momento.</p>
-                        @endif
+                    {{-- Precio --}}
+                    <div class="text-right">
+                        <p class="text-gray-400 text-xs mb-0.5">Precio por día</p>
+                        <p class="text-3xl font-bold text-gray-900">$ {{ number_format($vehicle->price_per_day, 2) }}</p>
                     </div>
 
+                    {{-- Corazón (a la derecha del precio) --}}
+                    @auth
+                        @php $esFav = auth()->user()->favoriteVehicles()->where('vehicle_id', $vehicle->id)->exists(); @endphp
+                        <form action="{{ route('favoritos.toggle', $vehicle) }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                    class="w-9 h-9 rounded-full border flex items-center justify-center transition-colors
+                                           {{ $esFav ? 'border-red-200 bg-red-50 text-red-500 hover:bg-red-100' : 'border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-500 hover:bg-red-50' }}"
+                                    title="{{ $esFav ? 'Quitar de favoritos' : 'Guardar en favoritos' }}">
+                                @if ($esFav)
+                                    <x-heroicon-s-heart class="w-5 h-5" />
+                                @else
+                                    <x-heroicon-o-heart class="w-5 h-5" />
+                                @endif
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}"
+                           class="w-9 h-9 rounded-full border border-gray-200 text-gray-400 flex items-center justify-center hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-colors"
+                           title="Inicia sesión para guardar en favoritos">
+                            <x-heroicon-o-heart class="w-5 h-5" />
+                        </a>
+                    @endauth
                 </div>
+            </div>
+
+            {{-- ===== FICHA TÉCNICA: grid 2 columnas ===== --}}
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Ficha técnica</h3>
+            <div class="grid grid-cols-2 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden mb-6">
+                @php
+                    $specs = array_values(array_filter([
+                        ['Categoría',   $vehicle->category->name],
+                        ['Combustible', ucfirst($vehicle->fuel_type)],
+                        ['Transmisión', ucfirst($vehicle->transmission_type)],
+                        ['Pasajeros',   $vehicle->passenger_capacity . ' personas'],
+                        $vehicle->year                  ? ['Año',     $vehicle->year]                              : null,
+                        $vehicle->luggage_capacity !== null ? ['Maletas', $vehicle->luggage_capacity . ' maletas'] : null,
+                        $vehicle->current_mileage !== null  ? ['Km actual', number_format($vehicle->current_mileage) . ' km'] : null,
+                    ]));
+                @endphp
+                @foreach ($specs as $spec)
+                    <div class="bg-white px-4 py-3">
+                        <p class="text-xs text-gray-400 font-medium mb-0.5">{{ $spec[0] }}</p>
+                        <p class="text-sm font-semibold text-gray-900">{{ $spec[1] }}</p>
+                    </div>
+                @endforeach
+                @if (count($specs) % 2 !== 0)
+                    <div class="bg-white"></div>
+                @endif
+            </div>
+
+            {{-- Características --}}
+            @if ($vehicle->key_features)
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Características</h3>
+                <div class="flex flex-wrap gap-2 mb-6">
+                    @foreach (explode(',', $vehicle->key_features) as $feature)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                            {{ trim($feature) }}
+                        </span>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- ===== EXTRAS: acordeón ===== --}}
+            @if (isset($extras) && $extras->isNotEmpty())
+                <div class="mb-6">
+                    <x-accordion>
+                        <x-accordion.item>
+                            <x-accordion.title size="sm">Extras disponibles</x-accordion.title>
+                            <x-accordion.content>
+                                <div class="border border-gray-200 rounded-lg overflow-hidden mt-2">
+                                    <table class="w-full text-sm">
+                                        <tbody class="divide-y divide-gray-200">
+                                            @foreach ($extras as $extra)
+                                                <tr class="hover:bg-gray-50 transition-colors">
+                                                    <td class="px-4 py-3 font-medium text-gray-900">{{ $extra->name }}</td>
+                                                    <td class="px-4 py-3 text-gray-400 text-xs">
+                                                        {{ $extra->selection_type === 'single' ? 'Por alquiler' : 'Por unidad' }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-right font-bold text-gray-900">
+                                                        + ${{ number_format($extra->price, 2) }}
+                                                        <span class="text-xs font-normal text-gray-400"> / día</span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-2 px-1">Los extras se seleccionan al hacer la reserva.</p>
+                            </x-accordion.content>
+                        </x-accordion.item>
+                    </x-accordion>
+                </div>
+            @endif
+
+            <hr class="border-gray-200 my-5">
+
+            {{-- Botón reservar --}}
+            <div class="flex justify-end">
+                @if ($vehicle->status === 'disponible')
+                    <a href="{{ auth()->check() ? route('vehiculos.reservar', $vehicle) : route('login') }}"
+                       class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-[var(--radius)] text-sm font-medium hover:opacity-90 transition-opacity">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        @auth Reservar este vehículo @else Iniciar sesión para reservar @endauth
+                    </a>
+                @else
+                    <span class="inline-flex items-center px-4 py-2 rounded-[var(--radius)] text-sm bg-gray-100 text-gray-500">
+                        No disponible para reservas
+                    </span>
+                @endif
             </div>
 
         </div>
     </div>
+
+</div>
+
 </x-app-layout>
