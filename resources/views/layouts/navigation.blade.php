@@ -1,100 +1,176 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
+{{-- HEADER --}}
+<x-header sticky class="h-20 shadow-md">
+
+    {{-- Mobile: sidebar toggle --}}
+    <button class="lg:hidden -ml-1 shrink-0 size-9 inline-flex items-center justify-center rounded-[var(--radius)] bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
+            x-data @click="$dispatch('sidebar:toggle')"
+            aria-label="Abrir menú">
+        <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+    {{-- Logo --}}
+    <a href="{{ route('inicio') }}"
+       class="limelight-regular font-bold text-lg text-[var(--foreground)] shrink-0">
+        AutoAlquiler
+    </a>
+
+    {{-- Desktop nav links --}}
+    <nav class="max-lg:hidden flex items-center gap-1 ml-6">
+        @php
+            $navLinks = (auth()->check() && auth()->user()->isAdmin())
+                ? [
+                    ['label' => 'Dashboard',  'href' => route('admin.dashboard'),        'match' => 'admin.dashboard'],
+                    ['label' => 'Reservas',   'href' => route('admin.reservas.index'),   'match' => 'admin.reservas.*'],
+                    ['label' => 'Vehículos',  'href' => route('admin.vehiculos.index'),  'match' => 'admin.vehiculos.*'],
+                    ['label' => 'Usuarios',   'href' => route('admin.usuarios.index'),   'match' => 'admin.usuarios.*'],
+                    ['label' => 'Categorías', 'href' => route('admin.categorias.index'), 'match' => 'admin.categorias.*'],
+                    ['label' => 'Extras',     'href' => route('admin.extras.index'),     'match' => 'admin.extras.*'],
+                    ['label' => 'Reportes',   'href' => route('admin.reportes.index'),   'match' => 'admin.reportes.*'],
+                ]
+                : [
+                    ['label' => 'Catálogo',     'href' => route('vehiculos.index'),    'match' => 'vehiculos.*'],
+                    ['label' => 'Mis Reservas', 'href' => route('mis-reservas.index'), 'match' => 'mis-reservas.*'],
+                    ['label' => 'Mis Listas',   'href' => route('favoritos.index'),    'match' => 'favoritos.*'],
+                ];
+        @endphp
+        @foreach ($navLinks as $link)
+            <a href="{{ $link['href'] }}"
+               class="px-3 py-1.5 text-sm rounded-[var(--radius-inner)] transition-colors
+                      {{ request()->routeIs($link['match']) ? 'bg-[var(--muted)] font-medium' : 'opacity-70 hover:opacity-100 hover:bg-[var(--muted)]' }}">
+                {{ $link['label'] }}
+            </a>
+        @endforeach
+    </nav>
+
+    {{-- Spacer --}}
+    <div class="flex-1"></div>
+
+    {{-- Auth section --}}
+    @auth
+        <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open"
+                    class="flex items-center gap-2 h-9 px-2 rounded-[var(--radius)] text-sm hover:bg-[var(--muted)] transition-colors">
+                <div class="size-8 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] flex items-center justify-center text-xs font-bold shrink-0">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                <span class="hidden sm:block font-medium max-w-[120px] truncate">{{ Auth::user()->name }}</span>
+                <svg class="size-4 opacity-50 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" x-cloak
+                 class="absolute right-0 mt-1 w-52 bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] shadow-md py-1 z-50">
+                <div class="px-4 py-2.5 border-b border-[var(--border)]">
+                    <p class="text-sm font-semibold truncate">{{ Auth::user()->name }}</p>
+                    <p class="text-xs opacity-50 truncate">{{ Auth::user()->email }}</p>
                 </div>
-            </div>
-
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
+                <a href="{{ route('perfil.edit') }}"
+                   class="flex items-center px-4 py-2 text-sm hover:bg-[var(--muted)] transition-colors">
+                    Mi Perfil
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
+                    <button type="submit"
+                            class="w-full text-left px-4 py-2 text-sm text-[var(--danger)] hover:bg-[var(--muted)] transition-colors">
+                        Cerrar sesión
+                    </button>
                 </form>
             </div>
         </div>
-    </div>
-</nav>
+    @else
+        <div class="flex items-center gap-2">
+            <x-btn href="{{ route('login') }}" style="outline" size="sm">Iniciar sesión</x-btn>
+            <x-btn href="{{ route('register') }}" size="sm">Registrarse</x-btn>
+        </div>
+    @endauth
+
+</x-header>
+
+{{-- SIDEBAR (mobile only) --}}
+<x-sidebar class="lg:hidden" sticky>
+
+    <x-sidebar-toggle aria-label="Cerrar menú">
+        <x-heroicon-o-x-mark class="size-5 text-[var(--muted-foreground)]" />
+    </x-sidebar-toggle>
+
+    <x-accordion :exclusive="true">
+        @auth
+            @if(auth()->user()->isAdmin())
+                <x-accordion.item :expanded="true">
+                    <x-accordion.title>Panel Admin</x-accordion.title>
+                    <x-accordion.content>
+                        @foreach ([
+                            ['route' => 'admin.dashboard',        'label' => 'Dashboard',  'match' => 'admin.dashboard'],
+                            ['route' => 'admin.reservas.index',   'label' => 'Reservas',   'match' => 'admin.reservas.*'],
+                            ['route' => 'admin.vehiculos.index',  'label' => 'Vehículos',  'match' => 'admin.vehiculos.*'],
+                            ['route' => 'admin.usuarios.index',   'label' => 'Usuarios',   'match' => 'admin.usuarios.*'],
+                            ['route' => 'admin.categorias.index', 'label' => 'Categorías', 'match' => 'admin.categorias.*'],
+                            ['route' => 'admin.extras.index',     'label' => 'Extras',     'match' => 'admin.extras.*'],
+                            ['route' => 'admin.reportes.index',   'label' => 'Reportes',   'match' => 'admin.reportes.*'],
+                        ] as $item)
+                            <a href="{{ route($item['route']) }}"
+                               class="flex items-center px-3 py-2 text-sm rounded-[var(--radius-inner)] transition-colors
+                                      {{ request()->routeIs($item['match']) ? 'bg-[var(--muted)] font-medium' : 'hover:bg-[var(--muted)]' }}">
+                                {{ $item['label'] }}
+                            </a>
+                        @endforeach
+                    </x-accordion.content>
+                </x-accordion.item>
+            @else
+                <x-accordion.item :expanded="true">
+                    <x-accordion.title>Navegación</x-accordion.title>
+                    <x-accordion.content>
+                        @foreach ([
+                            ['route' => 'vehiculos.index',    'label' => 'Catálogo',     'match' => 'vehiculos.*'],
+                            ['route' => 'mis-reservas.index', 'label' => 'Mis Reservas', 'match' => 'mis-reservas.*'],
+                            ['route' => 'favoritos.index',    'label' => 'Mis Listas',   'match' => 'favoritos.*'],
+                        ] as $item)
+                            <a href="{{ route($item['route']) }}"
+                               class="flex items-center px-3 py-2 text-sm rounded-[var(--radius-inner)] transition-colors
+                                      {{ request()->routeIs($item['match']) ? 'bg-[var(--muted)] font-medium' : 'hover:bg-[var(--muted)]' }}">
+                                {{ $item['label'] }}
+                            </a>
+                        @endforeach
+                    </x-accordion.content>
+                </x-accordion.item>
+            @endif
+        @else
+            <x-accordion.item :expanded="true">
+                <x-accordion.title>Navegación</x-accordion.title>
+                <x-accordion.content>
+                    @foreach ([
+                        ['route' => 'vehiculos.index',    'label' => 'Catálogo',     'match' => 'vehiculos.*'],
+                        ['route' => 'mis-reservas.index', 'label' => 'Mis Reservas', 'match' => 'mis-reservas.*'],
+                        ['route' => 'favoritos.index',    'label' => 'Mis Listas',   'match' => 'favoritos.*'],
+                    ] as $item)
+                        <a href="{{ route($item['route']) }}"
+                           class="flex items-center px-3 py-2 text-sm rounded-[var(--radius-inner)] transition-colors
+                                  {{ request()->routeIs($item['match']) ? 'bg-[var(--muted)] font-medium' : 'hover:bg-[var(--muted)]' }}">
+                            {{ $item['label'] }}
+                        </a>
+                    @endforeach
+                </x-accordion.content>
+            </x-accordion.item>
+        @endauth
+
+        <x-accordion.item>
+            <x-accordion.title>Legal</x-accordion.title>
+            <x-accordion.content>
+                @foreach ([
+                    ['route' => 'terminos',   'label' => 'Términos y condiciones', 'match' => 'terminos'],
+                    ['route' => 'privacidad', 'label' => 'Política de privacidad', 'match' => 'privacidad'],
+                    ['route' => 'contacto',   'label' => 'Contacto',               'match' => 'contacto'],
+                ] as $item)
+                    <a href="{{ route($item['route']) }}"
+                       class="flex items-center px-3 py-2 text-sm rounded-[var(--radius-inner)] transition-colors
+                              {{ request()->routeIs($item['match']) ? 'bg-[var(--muted)] font-medium' : 'hover:bg-[var(--muted)]' }}">
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            </x-accordion.content>
+        </x-accordion.item>
+    </x-accordion>
+
+</x-sidebar>

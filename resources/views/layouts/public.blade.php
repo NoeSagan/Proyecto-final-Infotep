@@ -21,8 +21,11 @@
 
         @include('layouts.navigation')
 
-        <x-main>
-            {{ $slot }}
+        <x-main class="px-0 flex flex-col min-h-[calc(100dvh-5rem)]">
+            <div class="flex-1">
+                {{ $slot }}
+            </div>
+            @include('layouts.footer')
         </x-main>
 
         @ddfsnScripts
