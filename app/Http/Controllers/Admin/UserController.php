@@ -8,12 +8,19 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 'cliente')
-            ->withCount('reservations')
-            ->orderBy('name')
-            ->paginate(15);
+        $query = User::where('role', 'cliente')->withCount('reservations');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ilike', "%{$search}%")
+                  ->orWhere('email', 'ilike', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('name')->paginate(15)->withQueryString();
 
         return view('admin.usuarios.index', compact('users'));
     }

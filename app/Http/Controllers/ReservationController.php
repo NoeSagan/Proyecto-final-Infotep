@@ -95,15 +95,32 @@ class ReservationController extends Controller
         return view('reservas.show', compact('reservation'));
     }
 
+    public function comprobante(Reservation $reservation)
+    {
+        abort_if($reservation->user_id !== auth()->id(), 403);
+
+        $reservation->load('vehicle.category', 'extras', 'user');
+        return view('reservas.comprobante', compact('reservation'));
+    }
+
     public function cancel(Reservation $reservation)
     {
         abort_if($reservation->user_id !== auth()->id(), 403);
-        abort_if($reservation->status !== 'pendiente', 403);
+
+        if (! $reservation->canBeCancelled()) {
+            return redirect()->route('mis-reservas.show', $reservation)
+                ->with('error', 'Esta reserva no puede ser cancelada.');
+        }
+
+        $fee = $reservation->cancellationFee();
 
         $reservation->update(['status' => 'cancelada']);
         $reservation->vehicle->update(['status' => 'disponible']);
 
-        return redirect()->route('mis-reservas.index')
-            ->with('success', 'Reserva cancelada correctamente.');
+        $message = $fee > 0
+            ? 'Reserva cancelada. Cargo por cancelación tardía: $ ' . number_format($fee, 2) . '. El reembolso restante será procesado.'
+            : 'Reserva cancelada. No se aplican cargos.';
+
+        return redirect()->route('mis-reservas.index')->with('success', $message);
     }
 }

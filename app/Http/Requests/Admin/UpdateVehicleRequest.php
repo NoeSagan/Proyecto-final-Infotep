@@ -18,6 +18,7 @@ class UpdateVehicleRequest extends FormRequest
             'brand'              => ['required', 'string', 'max:255'],
             'model'              => ['required', 'string', 'max:255'],
             'model_alternative'  => ['nullable', 'string', 'max:255'],
+            'year'               => ['nullable', 'integer', 'min:1990', 'max:' . (date('Y') + 1)],
             'plate'              => ['required', 'string', 'max:20', 'unique:vehicles,plate,' . $this->vehicle->id],
             'price_per_day'      => ['required', 'numeric', 'min:0'],
             'status'             => ['required', 'in:disponible,alquilado,mantenimiento'],

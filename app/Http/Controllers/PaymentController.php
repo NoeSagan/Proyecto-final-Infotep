@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ReservationConfirmed;
 use App\Models\Reservation;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
     public function show(Reservation $reservation)
     {
         abort_if($reservation->user_id !== auth()->id(), 403);
-        abort_if($reservation->status !== 'pendiente', 404);
+
+        if ($reservation->status !== 'pendiente') {
+            return redirect()->route('mis-reservas.show', $reservation)
+                ->with('info', 'Esta reserva ya fue procesada.');
+        }
 
         $reservation->load('vehicle.category', 'extras');
         return view('reservas.pago', compact('reservation'));
@@ -18,7 +24,11 @@ class PaymentController extends Controller
     public function confirm(Reservation $reservation)
     {
         abort_if($reservation->user_id !== auth()->id(), 403);
-        abort_if($reservation->status !== 'pendiente', 404);
+
+        if ($reservation->status !== 'pendiente') {
+            return redirect()->route('mis-reservas.show', $reservation)
+                ->with('info', 'Esta reserva ya fue confirmada anteriormente.');
+        }
 
         $vehicle = $reservation->vehicle;
 
@@ -31,7 +41,14 @@ class PaymentController extends Controller
 
         $vehicle->update(['status' => 'alquilado']);
 
+        $reservation->load('user', 'extras');
+        try {
+            Mail::to($reservation->user->email)->send(new ReservationConfirmed($reservation));
+        } catch (\Throwable) {
+            // Email failure should not block the user flow
+        }
+
         return redirect()->route('mis-reservas.show', $reservation)
-            ->with('success', '¡Reserva confirmada! Los datos de entrega han sido registrados.');
+            ->with('success', '¡Reserva confirmada! Los datos de entrega han sido registrados. Te enviamos un correo de confirmación.');
     }
 }

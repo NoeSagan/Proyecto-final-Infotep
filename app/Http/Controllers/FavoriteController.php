@@ -16,17 +16,18 @@ class FavoriteController extends Controller
         return view('favoritos.index', compact('vehicles'));
     }
 
-    public function store(Vehicle $vehicle)
+    public function toggle(Vehicle $vehicle)
     {
-        auth()->user()->favoriteVehicles()->syncWithoutDetaching([$vehicle->id]);
+        $user = auth()->user();
 
-        return back()->with('success', 'Vehículo añadido a favoritos.');
-    }
+        if ($user->favoriteVehicles()->where('vehicle_id', $vehicle->id)->exists()) {
+            $user->favoriteVehicles()->detach($vehicle->id);
+            $msg = 'Vehículo eliminado de favoritos.';
+        } else {
+            $user->favoriteVehicles()->syncWithoutDetaching([$vehicle->id]);
+            $msg = 'Vehículo añadido a favoritos.';
+        }
 
-    public function destroy(Vehicle $vehicle)
-    {
-        auth()->user()->favoriteVehicles()->detach($vehicle->id);
-
-        return back()->with('success', 'Vehículo eliminado de favoritos.');
+        return back()->with('success', $msg);
     }
 }
