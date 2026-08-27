@@ -10,14 +10,13 @@ class ExtraSeeder extends Seeder
     public function run(): void
     {
         $extras = [
-            ['name' => 'GPS',                          'price' => 5.00],
-            ['name' => 'Asiento para bebés',           'price' => 8.00],
-            ['name' => 'Asistencia en carretera',      'price' => 12.00],
-            ['name' => 'Seguro de ocupantes',          'price' => 15.00],
-            ['name' => 'Portaequipajes',               'price' => 10.00],
-            ['name' => 'Portabicicletas',              'price' => 10.00],
-            ['name' => 'Conductor adicional',          'price' => 7.00],
-            ['name' => 'WiFi portátil',                'price' => 6.00],
+            ['name' => 'GPS',                     'price' => 5.00,  'selection_type' => 'single'],
+            ['name' => 'Asiento para bebés',      'price' => 8.00,  'selection_type' => 'multiple'],
+            ['name' => 'Asistencia en carretera', 'price' => 12.00, 'selection_type' => 'single'],
+            ['name' => 'Seguro de ocupantes',     'price' => 15.00, 'selection_type' => 'single'],
+            ['name' => 'Portaequipajes',          'price' => 10.00, 'selection_type' => 'single'],
+            ['name' => 'Portabicicletas',         'price' => 10.00, 'selection_type' => 'multiple'],
+            ['name' => 'WiFi portátil',           'price' => 6.00,  'selection_type' => 'single'],
         ];
 
         foreach ($extras as $extra) {

@@ -8,4 +8,10 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    css: {
+        lightningcss: false,
+    },
+    build: {
+        cssMinify: 'esbuild',
+    },
 });
