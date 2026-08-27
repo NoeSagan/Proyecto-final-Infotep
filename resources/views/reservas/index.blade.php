@@ -1,87 +1,87 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Mis Reservas</h2>
-    </x-slot>
+    <x-slot:title>Mis Reservas | AutoAlquiler</x-slot:title>
 
-    <div class="py-8">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-            @if (session('success'))
-                <div class="mb-4 bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded">
-                    {{ session('success') }}
-                </div>
-            @endif
+        <h1 class="text-xl font-semibold text-[var(--foreground)] mb-5">Mis Reservas</h1>
 
-            @forelse ($reservations as $reservation)
-                @php
-                    $statusColors = [
-                        'pendiente'  => 'bg-yellow-100 text-yellow-800',
-                        'confirmada' => 'bg-green-100 text-green-800',
-                        'completada' => 'bg-blue-100 text-blue-800',
-                        'cancelada'  => 'bg-red-100 text-red-800',
-                    ];
-                    $color = $statusColors[$reservation->status] ?? 'bg-gray-100 text-gray-800';
-                @endphp
+        @if (session('success'))
+            <x-alert style="success" class="mb-4">{{ session('success') }}</x-alert>
+        @endif
+        @if (session('error'))
+            <x-alert style="danger" class="mb-4">{{ session('error') }}</x-alert>
+        @endif
 
-                <div class="bg-white shadow-sm rounded-lg mb-4 overflow-hidden">
-                    <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-bold text-gray-900">
-                                    {{ $reservation->vehicle->brand }} {{ $reservation->vehicle->model }}
-                                </span>
-                                <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ $color }}">
-                                    {{ ucfirst($reservation->status) }}
-                                </span>
-                            </div>
-                            <p class="text-sm text-gray-500">{{ $reservation->vehicle->category->name }} · Placa {{ $reservation->vehicle->plate }}</p>
-                            <p class="text-sm text-gray-600 mt-1">
-                                {{ $reservation->start_date->format('d/m/Y') }} → {{ $reservation->end_date->format('d/m/Y') }}
-                                &nbsp;·&nbsp; {{ $reservation->start_date->diffInDays($reservation->end_date) }} días
-                            </p>
-                        </div>
-
-                        <div class="flex flex-col sm:items-end gap-2">
-                            <span class="text-lg font-bold text-gray-900">$ {{ number_format($reservation->total_cost, 2) }}</span>
-                            <div class="flex gap-2">
+        <div class="overflow-x-auto">
+        <x-table>
+            <x-table-header>
+                <x-table-row>
+                    <x-table-head>#</x-table-head>
+                    <x-table-head>Vehículo</x-table-head>
+                    <x-table-head>Fechas</x-table-head>
+                    <x-table-head>Estado</x-table-head>
+                    <x-table-head align="end">Total</x-table-head>
+                    <x-table-head align="end">Acciones</x-table-head>
+                </x-table-row>
+            </x-table-header>
+            <x-table-body>
+                @forelse ($reservations as $i => $reservation)
+                    @php
+                        $statusLabel = match($reservation->status) {
+                            'pendiente'  => 'Pendiente',
+                            'confirmada' => 'Confirmada',
+                            'completada' => 'Completada',
+                            'cancelada'  => 'Cancelada',
+                            default      => ucfirst($reservation->status),
+                        };
+                        $dias = $reservation->start_date->diffInDays($reservation->end_date);
+                    @endphp
+                    <x-table-row>
+                        <x-table-head class="text-[var(--muted-foreground)] font-mono text-xs">
+                            #{{ str_pad($reservations->firstItem() + $i, 4, '0', STR_PAD_LEFT) }}
+                        </x-table-head>
+                        <x-table-cell>
+                            <p class="font-medium">{{ $reservation->vehicle->brand }} {{ $reservation->vehicle->model }}</p>
+                            <p class="text-xs text-[var(--muted-foreground)]">{{ $reservation->vehicle->category->name }}</p>
+                        </x-table-cell>
+                        <x-table-cell class="text-xs text-[var(--muted-foreground)] whitespace-nowrap">
+                            {{ $reservation->start_date->format('d/m/Y') }} → {{ $reservation->end_date->format('d/m/Y') }}
+                            <span class="ml-1">({{ $dias }} día{{ $dias !== 1 ? 's' : '' }})</span>
+                        </x-table-cell>
+                        <x-table-cell>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-900 text-white">
+                                {{ $statusLabel }}
+                            </span>
+                        </x-table-cell>
+                        <x-table-cell align="end" class="font-semibold">
+                            $ {{ number_format($reservation->total_cost, 2) }}
+                        </x-table-cell>
+                        <x-table-cell align="end">
+                            <div class="flex items-center justify-end gap-1">
                                 @if ($reservation->status === 'pendiente')
-                                    <a href="{{ route('reservas.pago', $reservation) }}"
-                                       class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-3 rounded-lg transition">
-                                        Pagar
-                                    </a>
-                                    <form action="{{ route('mis-reservas.cancel', $reservation) }}" method="POST"
-                                          onsubmit="return confirm('¿Cancelar esta reserva?')">
-                                        @csrf
-                                        <button type="submit"
-                                                class="text-sm border border-red-300 text-red-600 hover:bg-red-50 font-medium py-1.5 px-3 rounded-lg transition">
-                                            Cancelar
-                                        </button>
-                                    </form>
+                                    <x-btn href="{{ route('reservas.pago', $reservation) }}" size="sm">Pagar</x-btn>
                                 @endif
-                                <a href="{{ route('mis-reservas.show', $reservation) }}"
-                                   class="text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-1.5 px-3 rounded-lg transition">
-                                    Ver detalle
-                                </a>
+                                <x-btn href="{{ route('mis-reservas.show', $reservation) }}" size="sm">Ver</x-btn>
                             </div>
-                        </div>
+                        </x-table-cell>
+                    </x-table-row>
+                @empty
+                    <x-table-row>
+                        <x-table-cell colspan="6" align="center" class="py-10 text-[var(--muted-foreground)]">
+                            No tienes reservas todavía.
+                            <a href="{{ route('vehiculos.index') }}" class="ml-2 underline text-[var(--foreground)] hover:opacity-70">Ver vehículos disponibles</a>
+                        </x-table-cell>
+                    </x-table-row>
+                @endforelse
+            </x-table-body>
+        </x-table>
+        </div>
 
-                    </div>
-                </div>
-
-            @empty
-                <div class="bg-white shadow-sm rounded-lg py-16 text-center text-gray-500">
-                    <p class="text-lg font-medium">No tienes reservas todavía</p>
-                    <a href="{{ route('vehiculos.index') }}" class="mt-3 inline-block text-blue-600 hover:underline text-sm">
-                        Ver vehículos disponibles
-                    </a>
-                </div>
-            @endforelse
-
-            <div class="mt-4">
+        @if ($reservations->hasPages())
+            <div class="mt-4 flex justify-center">
                 {{ $reservations->links() }}
             </div>
+        @endif
 
-        </div>
     </div>
 </x-app-layout>
