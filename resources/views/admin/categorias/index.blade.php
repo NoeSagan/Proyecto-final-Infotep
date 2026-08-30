@@ -33,7 +33,7 @@
                             {{ str_pad($categories->firstItem() + $i, 3, '0', STR_PAD_LEFT) }}
                         </x-table-head>
                         <x-table-cell class="font-medium">{{ $category->name }}</x-table-cell>
-                        <x-table-cell class="max-w-xs truncate text-[var(--muted-foreground)]">{{ $category->description ?? '—' }}</x-table-cell>
+                        <x-table-cell class="max-w-xs truncate text-[var(--muted-foreground)]">{{ $category->description ?? '-' }}</x-table-cell>
                         <x-table-cell>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--muted)] text-[var(--muted-foreground)]">
                                 {{ $category->vehicles_count }}

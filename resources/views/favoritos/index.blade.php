@@ -55,7 +55,7 @@
                                 </span>
                             </div>
 
-                            {{-- Corazón relleno — toggle favorito --}}
+                            {{-- Corazón relleno - toggle favorito --}}
                             <div class="absolute top-2.5 right-2.5">
                                 <form action="{{ route('favoritos.toggle', $vehicle) }}" method="POST"
                                       onclick="event.stopPropagation()">

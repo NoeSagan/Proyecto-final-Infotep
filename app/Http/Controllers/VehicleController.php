@@ -46,7 +46,7 @@ class VehicleController extends Controller
         // 1. AutoScout24 (listings reales con precio e imágenes)
         $result = $this->fetchAutoScout24Catalog($request);
 
-        // 2. CarSpecs (marcas × modelos — miles de vehículos)
+        // 2. CarSpecs (marcas × modelos - miles de vehículos)
         if ($result === null) {
             $result = $this->fetchCarSpecsCatalog($request);
         }
@@ -98,7 +98,7 @@ class VehicleController extends Controller
     }
 
     // -------------------------------------------------------------------------
-    // Detalle — vehículo de la BD
+    // Detalle - vehículo de la BD
     // -------------------------------------------------------------------------
 
     public function show(Vehicle $vehicle)
@@ -115,7 +115,7 @@ class VehicleController extends Controller
     }
 
     // -------------------------------------------------------------------------
-    // Detalle — listing externo (AutoScout24 o CarSpecs) → import on demand
+    // Detalle - listing externo (AutoScout24 o CarSpecs) → import on demand
     // -------------------------------------------------------------------------
 
     public function showListing(string $listingId)

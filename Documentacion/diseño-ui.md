@@ -1,4 +1,4 @@
-# Sistema de Diseño — AutoAlquiler
+# Sistema de Diseño - AutoAlquiler
 
 Justificación y guía de uso de los componentes de interfaz, la paleta de color, la tipografía de escala y los efectos visuales del sistema. Toda la capa de UI está construida sobre la librería **ddfsn/blade-components** integrada con **Tailwind CSS v3**.
 
@@ -10,10 +10,10 @@ La paleta está pensada para transmitir confianza, claridad y modernidad. Se evi
 
 | Rol | Hex | Texto sobre él |
 |---|---|---|
-| **Base 100** | `#f7f9fa` | — fondo general de página |
-| **Base 200** | `#eef2f6` | — fondos de card y tabla |
-| **Base 300** | `#dfe5ed` | — bordes y divisores |
-| **Texto base** | `#0d1529` | — body copy, labels |
+| **Base 100** | `#f7f9fa` | - fondo general de página |
+| **Base 200** | `#eef2f6` | - fondos de card y tabla |
+| **Base 300** | `#dfe5ed` | - bordes y divisores |
+| **Texto base** | `#0d1529` | - body copy, labels |
 | **Primario** | `#000000` | `#ffffff` |
 | **Secundario** | `#135bf9` | `#eff6ff` |
 | **Accent** | `#000000` | `#ffffff` |
@@ -152,8 +152,8 @@ Representación visual de un usuario o de un grupo de usuarios.
 **Usos en el sistema:**
 
 - **Header / Dropdown de usuario:** avatar `sm` del usuario autenticado junto a su nombre.
-- **Ficha de vehículo — social proof:** stack de avatares `xs` con un contador de tipo "3 personas lo están viendo" para generar urgencia de reserva.
-- **Panel de admin — lista de usuarios:** avatar `sm` para identificar rápidamente a cada usuario en la tabla.
+- **Ficha de vehículo - social proof:** stack de avatares `xs` con un contador de tipo "3 personas lo están viendo" para generar urgencia de reserva.
+- **Panel de admin - lista de usuarios:** avatar `sm` para identificar rápidamente a cada usuario en la tabla.
 
 ```blade
 {{-- Stack de social proof --}}
@@ -229,7 +229,7 @@ Agrupa botones relacionados en una unidad visual compacta. Comunica que las opci
 
 - **Formulario de contacto / reporte:** toolbar de formato de texto (negrita, cursiva, tachado, alineación).
 - **Filtros del catálogo:** grupo de opciones de combustible o transmisión como alternativa a un `<select>`.
-- **Panel de admin — acciones de fila:** en tablas donde cada fila tiene múltiples acciones rápidas (Ver / Editar / Eliminar) agrupadas para ahorrar espacio.
+- **Panel de admin - acciones de fila:** en tablas donde cada fila tiene múltiples acciones rápidas (Ver / Editar / Eliminar) agrupadas para ahorrar espacio.
 
 ```blade
 <x-btn.group>
@@ -249,7 +249,7 @@ Contenedor con cabecera, cuerpo y pie claramente separados. Aporta jerarquía vi
 
 - **Login, registro y restablecimiento de contraseña:** el formulario de autenticación dentro de una card centrada en pantalla es el patrón estándar de la industria. Transmite seguridad y focaliza la atención.
 - **Resumen de reserva en el flujo de pago:** la card agrupa el detalle del vehículo, las fechas, los extras y el total antes de confirmar el pago.
-- **Dashboard admin — métricas:** cada indicador clave (reservas activas, ingresos del mes, vehículos disponibles) vive en su propia card para facilitar el escaneo visual.
+- **Dashboard admin - métricas:** cada indicador clave (reservas activas, ingresos del mes, vehículos disponibles) vive en su propia card para facilitar el escaneo visual.
 
 ```blade
 <x-card>
@@ -289,7 +289,7 @@ Listado estructurado de ítems relacionados, con soporte para botones y badges i
 **Usos en el sistema:**
 
 - **Dashboard admin:** listado de últimas reservas, usuarios recientes o vehículos en mantenimiento.
-- **Ficha de vehículo — extras:** lista de servicios adicionales disponibles con su precio y tipo.
+- **Ficha de vehículo - extras:** lista de servicios adicionales disponibles con su precio y tipo.
 - **Perfil de usuario:** datos personales (nombre, correo, teléfono) presentados como campo–valor.
 - **Panel de facturación:** historial de transacciones con badge de estado (Pagado, Pendiente, Reembolsado).
 
@@ -311,9 +311,9 @@ Estructura tabular para conjuntos de datos comparables. Soporta encabezado pegaj
 
 **Usos en el sistema:**
 
-- **Admin — listado de reservas, vehículos, usuarios, extras, categorías:** tabla principal de cada módulo CRUD.
-- **Admin — reportes:** vehículos más alquilados, ingresos por mes, ocupación por categoría.
-- **Cliente — Mis Reservas:** historial de reservas con estado, fechas y acciones rápidas.
+- **Admin - listado de reservas, vehículos, usuarios, extras, categorías:** tabla principal de cada módulo CRUD.
+- **Admin - reportes:** vehículos más alquilados, ingresos por mes, ocupación por categoría.
+- **Cliente - Mis Reservas:** historial de reservas con estado, fechas y acciones rápidas.
 
 ```blade
 <div class="overflow-x-auto">

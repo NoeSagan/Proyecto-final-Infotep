@@ -57,7 +57,7 @@ class AutoAlquilerTheme implements ThemeContract
             ThemeVariable::DANGER->value               => '#830c41',
             ThemeVariable::DANGER_FOREGROUND->value    => '#830c41',
 
-            // Radios — 1rem para todo (cards, alertas, botones, inputs)
+            // Radios - 1rem para todo (cards, alertas, botones, inputs)
             ThemeVariable::RADIUS->value               => '1rem',
             ThemeVariable::RADIUS_INNER->value         => '1rem',
         ];

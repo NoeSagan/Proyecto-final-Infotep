@@ -48,9 +48,9 @@ AutoAlquiler digitaliza el proceso completo de una empresa de alquiler de vehíc
 - Reportes: vehículos más alquilados, ingresos por mes, ocupación por categoría.
 
 ### Catálogo (tres fuentes en cascada)
-1. **AutoScout24** — listings reales con imágenes (API de pago, prioridad máxima).
-2. **CarSpecs** — 1 000+ modelos pre-cacheados (caché 24 h, fuente principal).
-3. **Base de datos local** — vehículos sembrados e importados manualmente.
+1. **AutoScout24** - listings reales con imágenes (API de pago, prioridad máxima).
+2. **CarSpecs** - 1 000+ modelos pre-cacheados (caché 24 h, fuente principal).
+3. **Base de datos local** - vehículos sembrados e importados manualmente.
 
 ---
 

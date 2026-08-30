@@ -57,7 +57,7 @@ class ImportVehicles extends Command
 
         $imgService = new CarImagesService();
         $bar        = $this->output->createProgressBar(count($toImport));
-        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% — %message%');
+        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% - %message%');
         $bar->start();
 
         $imported = 0;
@@ -70,7 +70,7 @@ class ImportVehicles extends Command
 
             $bar->setMessage("{$make} {$model}");
 
-            // Imagen desde Wikimedia (caché 7 días — no recarga si ya existe)
+            // Imagen desde Wikimedia (caché 7 días - no recarga si ya existe)
             $imageUrl = null;
             try {
                 $imageUrl = $imgService->getFirstImage($make, $model, 2022);

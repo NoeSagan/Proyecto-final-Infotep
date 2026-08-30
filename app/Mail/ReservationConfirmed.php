@@ -18,7 +18,7 @@ class ReservationConfirmed extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmación de Reserva #' . $this->reservation->id . ' — AutoAlquiler',
+            subject: 'Confirmación de Reserva #' . $this->reservation->id . ' - AutoAlquiler',
         );
     }
 

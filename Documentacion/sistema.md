@@ -1,4 +1,4 @@
-# AutoAlquiler — Documentación del Sistema
+# AutoAlquiler - Documentación del Sistema
 
 Descripción técnica y funcional completa del sistema de alquiler de vehículos desarrollado como proyecto final del curso de Desarrollo Web con PHP en INFOTEP.
 
@@ -16,10 +16,10 @@ AutoAlquiler es una aplicación web full-stack que digitaliza el proceso complet
 |---|---|---|
 | Lenguaje backend | PHP | 8.1+ |
 | Framework backend | Laravel | 11 |
-| Autenticación | Laravel Breeze | — |
-| ORM | Eloquent | — |
-| Base de datos | PostgreSQL | — (Supabase) |
-| Motor de vistas | Blade | — |
+| Autenticación | Laravel Breeze | - |
+| ORM | Eloquent | - |
+| Base de datos | PostgreSQL | - (Supabase) |
+| Motor de vistas | Blade | - |
 | CSS framework | Tailwind CSS | 3.4 |
 | Librería de UI | ddfsn/blade-components | 1.6.1 |
 | Bundler frontend | Vite | 8.x |
@@ -76,31 +76,31 @@ resources/
 ### 4.2 Campos clave por tabla
 
 **`users`**
-- `name`, `email`, `password` — datos de autenticación
-- `role` — `admin` o `cliente`
+- `name`, `email`, `password` - datos de autenticación
+- `role` - `admin` o `cliente`
 
 **`vehicles`**
-- `brand`, `model`, `year`, `plate` — identificación
-- `category_id` — relación con categoría
-- `fuel_type` — `gasolina`, `diesel`, `hibrido`, `electrico`
-- `transmission_type` — `automatica`, `manual`
-- `passenger_capacity`, `luggage_capacity` — capacidades
-- `price_per_day` — tarifa base
-- `status` — `disponible`, `alquilado`, `mantenimiento`
-- `image_url`, `external_id` — vehículos importados desde APIs externas
-- `current_mileage`, `key_features`, `model_alternative` — ficha técnica
+- `brand`, `model`, `year`, `plate` - identificación
+- `category_id` - relación con categoría
+- `fuel_type` - `gasolina`, `diesel`, `hibrido`, `electrico`
+- `transmission_type` - `automatica`, `manual`
+- `passenger_capacity`, `luggage_capacity` - capacidades
+- `price_per_day` - tarifa base
+- `status` - `disponible`, `alquilado`, `mantenimiento`
+- `image_url`, `external_id` - vehículos importados desde APIs externas
+- `current_mileage`, `key_features`, `model_alternative` - ficha técnica
 
 **`reservations`**
-- `user_id`, `vehicle_id` — relaciones principales
-- `start_date`, `end_date` — período de alquiler
-- `passenger_count` — pasajeros declarados en la reserva
-- `total_cost` — costo calculado al momento de la reserva
-- `status` — `pendiente`, `confirmada`, `completada`, `cancelada`
-- `delivery_plate`, `delivery_fuel_level`, `delivery_mileage` — datos registrados al confirmar el pago
+- `user_id`, `vehicle_id` - relaciones principales
+- `start_date`, `end_date` - período de alquiler
+- `passenger_count` - pasajeros declarados en la reserva
+- `total_cost` - costo calculado al momento de la reserva
+- `status` - `pendiente`, `confirmada`, `completada`, `cancelada`
+- `delivery_plate`, `delivery_fuel_level`, `delivery_mileage` - datos registrados al confirmar el pago
 
 **`extras`**
-- `name`, `price` — nombre y tarifa diaria
-- `selection_type` — `single` (checkbox, cantidad 1) o `multiple` (input numérico)
+- `name`, `price` - nombre y tarifa diaria
+- `selection_type` - `single` (checkbox, cantidad 1) o `multiple` (input numérico)
 
 **`reservation_extra` (pivot)**
 - `reservation_id`, `extra_id`, `quantity`
@@ -164,9 +164,9 @@ Muestra todos los vehículos disponibles. Acepta filtros por:
 - Presupuesto máximo por día
 
 El catálogo opera sobre tres fuentes de datos en cascada:
-1. **AutoScout24** (API externa con listings reales e imágenes) — cuota mensual, puede no estar disponible
-2. **CarSpecs** (1 000+ modelos pre-cacheados en `carspecs_catalog_v2`, TTL 24 h) — fuente principal cuando AutoScout24 falla
-3. **Base de datos local** — 29 vehículos sembrados + vehículos importados manualmente
+1. **AutoScout24** (API externa con listings reales e imágenes) - cuota mensual, puede no estar disponible
+2. **CarSpecs** (1 000+ modelos pre-cacheados en `carspecs_catalog_v2`, TTL 24 h) - fuente principal cuando AutoScout24 falla
+3. **Base de datos local** - 29 vehículos sembrados + vehículos importados manualmente
 
 Los vehículos de API se importan a la BD al primer acceso a su ficha (`import-on-demand`), recibiendo una placa generada (`EXT-{md5}`).
 
@@ -182,13 +182,13 @@ Muestra la ficha técnica completa: marca, modelo, año, categoría, combustible
 
 El proceso tiene tres pasos lineales, cada uno en su propia pantalla:
 
-**Paso 1 — Formulario de reserva** (`GET /vehiculos/{vehicle}/reservar`)
+**Paso 1 - Formulario de reserva** (`GET /vehiculos/{vehicle}/reservar`)
 El cliente selecciona fechas, número de pasajeros y extras. El costo total se calcula en tiempo real mediante JavaScript sin recargar la página. Al enviar, se crea la reserva en estado `pendiente`.
 
-**Paso 2 — Pantalla de pago** (`GET /reservas/{reservation}/pago`)
+**Paso 2 - Pantalla de pago** (`GET /reservas/{reservation}/pago`)
 Resumen completo de la reserva (vehículo, fechas, extras, total). El cliente puede confirmar el pago o guardarlo para después. Si confirma, el estado pasa a `confirmada` y se registran los datos de entrega del vehículo (placa real, nivel de combustible, kilometraje).
 
-**Paso 3 — Comprobante** (`GET /mis-reservas/{reservation}`)
+**Paso 3 - Comprobante** (`GET /mis-reservas/{reservation}`)
 Vista de detalle de la reserva confirmada, con enlace para imprimir el comprobante.
 
 ### 6.4 Cancelación de reservas
@@ -248,7 +248,7 @@ Accesible solo para usuarios con `role = admin`. Incluye:
 
 ### 7.1 Auto.dev (`AutoDevService`)
 
-**Uso:** `lookupByVin($vin)` — dado un número VIN, devuelve la ficha técnica del vehículo (marca, modelo, año, combustible, transmisión, capacidades). Se usa en el formulario de creación de vehículo del admin para autocompletar campos y reducir errores.
+**Uso:** `lookupByVin($vin)` - dado un número VIN, devuelve la ficha técnica del vehículo (marca, modelo, año, combustible, transmisión, capacidades). Se usa en el formulario de creación de vehículo del admin para autocompletar campos y reducir errores.
 
 ### 7.2 CarSpecs (`CarSpecsService`)
 
@@ -260,9 +260,9 @@ Accesible solo para usuarios con `role = admin`. Incluye:
 
 ### 7.4 Wikimedia Commons (`CarImagesService`)
 
-**Uso:** `getFirstImage($make, $model)` — busca una imagen pública del vehículo en Wikimedia Commons. Se usa como fallback cuando el vehículo de CarSpecs no tiene imagen propia. Las imágenes se cachean 7 días para no superar el límite de peticiones de la API.
+**Uso:** `getFirstImage($make, $model)` - busca una imagen pública del vehículo en Wikimedia Commons. Se usa como fallback cuando el vehículo de CarSpecs no tiene imagen propia. Las imágenes se cachean 7 días para no superar el límite de peticiones de la API.
 
-**`getBrandLogo($make)`** — obtiene el logo de la marca para mostrarlo en la landing page. También cacheado.
+**`getBrandLogo($make)`** - obtiene el logo de la marca para mostrarlo en la landing page. También cacheado.
 
 ---
 
