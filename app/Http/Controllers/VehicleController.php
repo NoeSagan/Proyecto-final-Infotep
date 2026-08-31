@@ -45,15 +45,27 @@ class VehicleController extends Controller
 
         // 1. AutoScout24 (listings reales con precio e imágenes)
         $result = $this->fetchAutoScout24Catalog($request);
+        if ($result !== null) {
+            \Log::info('[CATÁLOGO] Fuente activa: AutoScout24 - ' . $result['vehicles']->total() . ' vehículos');
+        } else {
+            \Log::info('[CATÁLOGO] AutoScout24 falló o devolvió vacío, probando CarSpecs...');
+        }
 
         // 2. CarSpecs (marcas × modelos - miles de vehículos)
         if ($result === null) {
+            $cacheExists = Cache::has('carspecs_catalog_v2');
+            \Log::info('[CATÁLOGO] CarSpecs caché existe: ' . ($cacheExists ? 'SÍ' : 'NO - ejecuta catalog:build'));
             $result = $this->fetchCarSpecsCatalog($request);
+            if ($result !== null) {
+                \Log::info('[CATÁLOGO] Fuente activa: CarSpecs - ' . $result['vehicles']->total() . ' vehículos');
+            }
         }
 
         if ($result !== null) {
             return view('vehiculos.index', array_merge($result, compact('categories')));
         }
+
+        \Log::warning('[CATÁLOGO] Fuente activa: BD local (fallback) - ambas APIs fallaron');
 
         // 3. Fallback: base de datos propia
         $query = Vehicle::with('category')->where('status', 'disponible');

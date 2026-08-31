@@ -61,7 +61,7 @@
                 </svg>
             </button>
             <div x-show="open" @click.away="open = false" x-cloak
-                 class="absolute right-0 mt-1 w-52 bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] shadow-md py-1 z-50">
+                 class="absolute right-0 top-full mt-2 w-52 bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] shadow-md py-1 z-10">
                 <div class="px-4 py-2.5 border-b border-[var(--border)]">
                     <p class="text-sm font-semibold truncate">{{ Auth::user()->name }}</p>
                     <p class="text-xs opacity-50 truncate">{{ Auth::user()->email }}</p>

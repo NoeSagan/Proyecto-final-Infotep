@@ -29,6 +29,11 @@
     background-color: var(--muted);
 }
 
+/* ── Header por encima de todas las secciones de página ── */
+[data-slot="header"] {
+    z-index: 70 !important;
+}
+
 /* ── Fix: ddfsn mobile sidebar (Tailwind v3 compatibility) ── */
 /* These rules replace Tailwind v4-only class syntax used by the vendor package */
 
@@ -44,9 +49,12 @@ ddfsn-sidebar[data-ddfsn-sidebar-breakpoint-down] {
     position: fixed !important;
     left: 0 !important;
     top: 0 !important;
+    width: 16rem !important;
     min-height: 100dvh !important;
     max-height: 100dvh !important;
     overflow-y: auto;
+    z-index: 80 !important;
+    background-color: var(--sidebar, #ffffff) !important;
 }
 
 /* Slide off-screen when collapsed on mobile */
